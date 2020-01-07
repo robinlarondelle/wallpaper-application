@@ -1,0 +1,30 @@
+{
+  "name": "wallpaper-application",
+  "version": "1.0.0",
+  "description": "Wallpaper application to set automatic wallpapers from Unsplash",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/robinlarondelle/wallpaper-application.git"
+  },
+  "keywords": [
+    "Wallpaper",
+    "Node",
+    "Unsplash",
+    "Android",
+    "Windows"
+  ],
+  "author": "Robin La Rondelle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robinlarondelle/wallpaper-application/issues"
+  },
+  "homepage": "https://github.com/robinlarondelle/wallpaper-application#readme",
+  "dependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
