@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/robinlarondelle/wallpaper-application.git"
+    "url": "https://github.com/robinlarondelle/wallpaper-application.git"
   },
   "keywords": [
     "Wallpaper",
