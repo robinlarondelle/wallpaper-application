@@ -29,7 +29,7 @@ module.exports = {
         let result = /[1-9]{1,3} ((hour[s]*)|(day[s]*)|(week[s]*)|(month[s]*))/.test(
           value
         );
-        return result ? true : "Max range is 999 [time-range]. Please make sure you use the correct format";
+        return result ? true : "Min is 1 hour, max is 2 weeks. Please make sure you use the correct format";
       },
       default: "1 hour"
     }
