@@ -39,36 +39,43 @@ console.log(`
 `)
 
 inquirer.prompt(settings.questions).then(awnswers => {
-  console.log(`\n\n Searching for new wallpapers in the ${awnswers.category} category`)
-  const imageSearchSettings = {
-    query: `${awnswers.category}`,
-    orientation: "landscape",
-    count: 100 //Get 100 pictures from the API
+  const main = () => {
+
+    console.log(`\n\n Searching for new wallpapers in the ${awnswers.category} category`)
+    const imageSearchSettings = {
+      query: `${awnswers.category}`,
+      orientation: "landscape",
+      count: 100 //Get 100 pictures from the API
+    }
+
+    unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
+      .then(response => {
+        let availablePictures = []
+        const fullPath = `${wallpaperDir}\\${awnswers.category}.jpg`
+
+        response.forEach(result => {
+          if (result.width > 1920 && result.height > 1080) { //HD-images only
+            availablePictures.push(result)
+          }
+        })
+
+        const result = availablePictures[getRandomInt(availablePictures.length - 1)] //pick a random picture
+        downloadUnsplashImage(result.urls.full, fullPath, (err, savedPath) => {
+          if (err) return err
+          setWindowsWallpaper(savedPath)
+        })
+      })
+
+      .catch(err => {
+        console.log("\nLooks like something went wrong! Error:\n")
+        console.log(err)
+        console.log("\nclosing application\n")
+        process.exit(0)
+      })
   }
 
-  unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
-    .then(response => {
-      let availablePictures = []
-      const fullPath = `${wallpaperDir}\\${awnswers.category}.jpg`
-
-      response.forEach(result => {
-        if (result.width > 1920 && result.height > 1080) { //HD-images only
-          availablePictures.push(result)
-        }
-      })
-
-      const result = availablePictures[getRandomInt(availablePictures.length - 1)] //pick a random picture
-      downloadUnsplashImage(result.urls.full, fullPath, (err, savedPath) => {
-        if (err) return err
-        setWindowsWallpaper(savedPath)
-      })
-    })
-
-    .catch(err => {
-      console.log("\nLooks like something went wrong! Error:\n")
-      console.log(err)
-      console.log("\nclosing application\n")
-    })
+  main() //run first time
+  setInterval(main, getIntervalInMilliSeconds(awnswers.interval)) //then run every interval the user gave
 })
 
 /**
@@ -138,4 +145,23 @@ const setWindowsWallpaper = path => {
 
 const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
+}
+
+/**
+ * This function turns the string interval the user provided to usable miliseconds
+ * @param {string} userInterval the interval the user gave as awnswer at the start of the application
+ */
+const getIntervalInMilliSeconds = (userInterval) => {
+  let number = userInterval.split(" ")[0]
+  let timeUnit = userInterval.split(" ")[1]  
+  
+  switch(timeUnit) {
+    case "hour" || "hours" : number = number * 1000 * 60 * 60; break;
+    case "day" || "days" : number = number * 1000 * 60 * 60 * 24; break;
+    case "week" || "weeks" : number = number * 1000 * 60 * 60 * 24 * 7; break;
+    case "month" || "months" : number = number * 1000 * 60 * 60 * 24 * 7 * 30,5; break; // i dont care about leapyears or februari
+    case "year" || "years" : number = number * 1000 * 60 * 60 * 24 * 7 * 30,5 * 365,25; break;
+  }
+
+  return number
 }
