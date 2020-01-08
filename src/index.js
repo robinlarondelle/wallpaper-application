@@ -39,13 +39,15 @@ console.log(`
 `)
 
 inquirer.prompt(settings.questions).then(awnswers => {
+  console.log(`\n\nWallpaper will be refreshed every ${awnswers.interval.split(" ")[0]} ${awnswers.interval.split(" ")[1]}`);
+  
   const main = () => {
 
-    console.log(`\n\n Searching for new wallpapers in the ${awnswers.category} category`)
+    console.log(`Searching for new wallpapers in the ${awnswers.category} category`)
     const imageSearchSettings = {
       query: `${awnswers.category}`,
       orientation: "landscape",
-      count: 100 //Get 100 pictures from the API
+      count: 10 //Get 10 pictures from the API
     }
 
     unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
@@ -138,7 +140,7 @@ const generateDownloadPath = (originalPathName, callback) => {
  */
 const setWindowsWallpaper = path => {
   (async () => {
-    await wallpaper.set(path)
+    await wallpaper.set(path, { screen: 'all', scale: 'auto' })
     console.log("Enjoy your new wallpaper!")
   })()
 }
@@ -153,14 +155,25 @@ const getRandomInt = (max) => {
  */
 const getIntervalInMilliSeconds = (userInterval) => {
   let number = userInterval.split(" ")[0]
-  let timeUnit = userInterval.split(" ")[1]  
-  
-  switch(timeUnit) {
-    case "hour" || "hours" : number = number * 1000 * 60 * 60; break;
-    case "day" || "days" : number = number * 1000 * 60 * 60 * 24; break;
-    case "week" || "weeks" : number = number * 1000 * 60 * 60 * 24 * 7; break;
-    case "month" || "months" : number = number * 1000 * 60 * 60 * 24 * 7 * 30,5; break; // i dont care about leapyears or februari
-    case "year" || "years" : number = number * 1000 * 60 * 60 * 24 * 7 * 30,5 * 365,25; break;
+  let timeUnit = userInterval.split(" ")[1]
+
+  switch (timeUnit) {
+    case "minute":
+    case "minutes":
+      number = number * 1000 * 60;
+      break;
+    case "hour":
+    case "hours":
+      number = number * 1000 * 60 * 60;
+      break;
+    case "day":
+    case "days":
+      number = number * 1000 * 60 * 60 * 24;
+      break;
+    case "week":
+    case "weeks":
+      number = number * 1000 * 60 * 60 * 24 * 7;
+      break;
   }
 
   return number

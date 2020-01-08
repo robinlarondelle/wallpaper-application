@@ -17,19 +17,19 @@ module.exports = {
       type: "confirm",
       name: "saveImages",
       message:
-        `Do you want the wallpaper to be saved on your computer? \nThey will be saved at '${homedir}\\Pictures\\Wallpaper Application'`,
+        `Do you want the wallpaper to be saved on your computer? \n  They will be saved at '${homedir}\\Pictures\\Wallpaper Application'`,
       default: true
     },
     {
       type: "input",
       name: "interval",
       message:
-        "At what interval should the wallpaper be updated? \nFormat: '[number] [time-range: hour[s], day[s] etc]'",
+        `At what interval should the wallpaper be updated?\n  Format: '[number] [time-range: hour[s], day[s] etc]'`,
       validate: function(value) {
-        let result = /[1-9]{1,3} ((hour[s]*)|(day[s]*)|(week[s]*)|(month[s]*))/.test(
+        let result = /[0-9]{1,3} ((minute[s]*)|(hour[s]*)|(day[s]*)|(week[s]*)|(month[s]*))/.test(
           value
         );
-        return result ? true : "Min is 1 hour, max is 2 weeks. Please make sure you use the correct format";
+        return result ? true : "Min is 5 minutes, max is 2 weeks. Please make sure you use the correct format";
       },
       default: "1 hour"
     }

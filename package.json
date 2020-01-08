@@ -26,6 +26,7 @@
   "homepage": "https://github.com/robinlarondelle/wallpaper-application#readme",
   "dependencies": {
     "axios": "^0.19.0",
+    "forever": "^2.0.0",
     "image-downloader": "^3.5.0",
     "inquirer": "^7.0.3",
     "node-fetch": "^2.6.0",
