@@ -37,7 +37,7 @@ console.log(`
 ╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
                             
 
-* * * * * * * * * * *  * * By Robin La Rondelle * * * * * * * * * * * *  * 
+* * * * * * * * * * * * * By Robin La Rondelle * * * * * * * * * * * * * 
 
 `);
 
@@ -67,7 +67,11 @@ inquirer.prompt(settings.questions).then(awnswers => {
           );
         }
       });
-    });
+    }).catch(err => {
+      console.log("\nLooks like something went wrong! Error:\n");
+      console.log(err);
+      console.log("\nclosing application\n");
+    })
 });
 
 /**
@@ -76,7 +80,7 @@ inquirer.prompt(settings.questions).then(awnswers => {
  * @param {string} filename the desired file name to save to. If the file name already exists, it will be appended with a number
  * @param {function} callback callback function which returns the filename the image is saved to
  */
-let downloadUnsplashImage = function(uri, filename, callback) {
+const downloadUnsplashImage = function(uri, filename, callback) {
   request.head(uri, function(err, res, body) {
     request(uri)
       .pipe(writeFile(filename))
@@ -84,19 +88,43 @@ let downloadUnsplashImage = function(uri, filename, callback) {
   });
 };
 
-let writeFile = function(filename) {
-  let folders = filename.split("\\");
-  folders.splice(-1,1)
-  folders = folders.join().replace(/,/g, "/")
-  fs.readdir(folders, (err, files) => {
+/**
+ * Stores a file in a given path. Appends a number to the file name if the file name already exists in the given directory
+ * @param {string} fullPath The full path name including the file name
+ */
+const writeFile = (fullPath) => {
+  let folders = fullPath.split("\\");
+  let imagename = folders.splice(-1,1).join()
+  folders = folders.join().replace(/,/g, "/") 
+  
+  try {
+    const files = fs.readdirSync(folders)
+    let counter = 1
+    for(var file in files) {
+      if (file === imagename) {
+        counter++
+      }
+    }
+
+    imagename = imagename.split(".")
+    imagename[0].concat(`-${counter}`)
+    console.log(imagename);
+    
+
     console.log(files);
-    fs.createWriteStream(filename, { flags: "a" });
-  });
+    
+  } catch (err) {
+    throw err
+  }
 }
 
-let setWindowsWallpaper = function(url) {
+/**
+ * Sets a windows wallpaper from a given path
+ * @param {string} path The full path to the image
+ */
+const setWindowsWallpaper = (path) => {
   (async () => {
-    await wallpaper.set(url);
+    await wallpaper.set(path);
     console.log("successfully set new wallpaper");
   })();
 };
