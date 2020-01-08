@@ -94,19 +94,21 @@ const downloadUnsplashImage = function(uri, filename, callback) {
  */
 const writeFile = (fullPath) => {
   let folders = fullPath.split("\\");
-  let imagename = folders.splice(-1,1).join()
+  let imagename = folders.splice(-1,1).join().toLowerCase()
   folders = folders.join().replace(/,/g, "/") 
   
   try {
     const files = fs.readdirSync(folders)
     let counter = 1
     for(var file in files) {
-      if (file === imagename) {
+      if (file.toLowerCase() === imagename) {
         counter++
       }
     }
 
     imagename = imagename.split(".")
+    console.log(imagename);
+    
     imagename[0].concat(`-${counter}`)
     console.log(imagename);
     
