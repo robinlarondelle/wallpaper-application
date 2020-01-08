@@ -9,15 +9,11 @@ const os = require("os")
 const inquirer = require("inquirer")
 const download = require('image-downloader')
 
-const homedir = os.homedir()
-let dir = `${homedir}\\Pictures\\Wallpaper Application`
-if (!fs.existsSync(dir)) fs.mkdirSync(dir)
-
 global.fetch = fetch
-
-const unsplash = new Unsplash({
-  accessKey: settings.accessKey
-})
+const unsplash = new Unsplash({ accessKey: settings.accessKey })
+const homedir = os.homedir()
+let wallpaperDir = `${homedir}\\Pictures\\Wallpaper Application`
+if (!fs.existsSync(wallpaperDir)) fs.mkdirSync(wallpaperDir) //Make sure the folder to write to exists
 
 console.log(`
 
@@ -43,30 +39,31 @@ console.log(`
 `)
 
 inquirer.prompt(settings.questions).then(awnswers => {
+  console.log(`\n\n Searching for new wallpapers in the ${awnswers.category} category`)
   const imageSearchSettings = {
     query: `${awnswers.category}`,
     orientation: "landscape",
-    count: 1
+    count: 100 //Get 100 pictures from the API
   }
-  console.log(
-    `\n\n Searching for new wallpapers in the ${awnswers.category} category`
-  )
 
-  unsplash.photos
-    .getRandomPhoto(imageSearchSettings).then(toJson).then(res => {
-      res.forEach(result => {
-        //HD-images only
-        if (result.width > 1920 && result.height > 1080) {
-          const fullPath = `${dir}\\${awnswers.category}.jpg`
-          console.log(fullPath);
-          
-          downloadUnsplashImage(result.urls.full, fullPath, (err, savedPath) => {
-            if (err) return err
-            setWindowsWallpaper(savedPath)
-          })
+  unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
+    .then(response => {
+      let availablePictures = []
+      const fullPath = `${wallpaperDir}\\${awnswers.category}.jpg`
+
+      response.forEach(result => {
+        if (result.width > 1920 && result.height > 1080) { //HD-images only
+          availablePictures.push(result)
         }
       })
+
+      const result = availablePictures[getRandomInt(availablePictures.length - 1)] //pick a random picture
+      downloadUnsplashImage(result.urls.full, fullPath, (err, savedPath) => {
+        if (err) return err
+        setWindowsWallpaper(savedPath)
+      })
     })
+
     .catch(err => {
       console.log("\nLooks like something went wrong! Error:\n")
       console.log(err)
@@ -86,16 +83,15 @@ const downloadUnsplashImage = (uri, path, callback) => {
 
     const options = {
       url: uri,
-      dest: downloadPath 
+      dest: downloadPath
     }
 
     download.image(options)
       .then(({ filename, image }) => {
-        console.log('Saved to', filename)
         callback(null, filename)
       })
       .catch((err) => callback(err))
-    })
+  })
 }
 
 /**
@@ -114,7 +110,7 @@ const generateDownloadPath = (originalPathName, callback) => {
     //Check how many files in the folder contain the desired filename
     files.forEach(file => {
       file = file.replace(/-[1-9]*/g, "") //remove suffix from folderfiles to compare with the original filename
-      if (file.toLowerCase() === imagename) counter++ 
+      if (file.toLowerCase() === imagename) counter++
     })
 
     //Generate new filename based on the amount of times the filename occured in the folder
@@ -136,6 +132,10 @@ const generateDownloadPath = (originalPathName, callback) => {
 const setWindowsWallpaper = path => {
   (async () => {
     await wallpaper.set(path)
-    console.log("successfully set new wallpaper")
+    console.log("Enjoy your new wallpaper!")
   })()
+}
+
+const getRandomInt = (max) => {
+  return Math.floor(Math.random() * Math.floor(max));
 }
