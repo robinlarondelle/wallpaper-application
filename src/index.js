@@ -8,6 +8,7 @@ const { toJson } = require("unsplash-js")
 const os = require("os")
 const inquirer = require("inquirer")
 const download = require('image-downloader')
+const moment = require("moment")
 
 global.fetch = fetch
 const unsplash = new Unsplash({ accessKey: settings.accessKey })
@@ -141,7 +142,7 @@ const generateDownloadPath = (originalPathName, callback) => {
 const setWindowsWallpaper = path => {
   (async () => {
     await wallpaper.set(path, { screen: 'all', scale: 'auto' })
-    console.log("Enjoy your new wallpaper!")
+    console.log(`Wallpaper set on ${moment().format("HH:mm:ss")}`)
   })()
 }
 
