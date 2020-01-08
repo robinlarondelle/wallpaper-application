@@ -6,12 +6,8 @@ module.exports = {
     {
       type: "input",
       name: "category",
-      message: "What category do you want as wallpaper? ",
-      validate: function(value) {
-        if (!value) return "No category provided. Defaulted to Rotterdam.";
-        return true
-      },
-      default: "Rotterdam"
+      message: "What category do you want as wallpaper? Leave empty if you want a random wallpaper.",
+
     },
     {
       type: "confirm",

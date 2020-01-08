@@ -44,12 +44,14 @@ inquirer.prompt(settings.questions).then(answers => {
   
   const main = () => {
 
-    console.log(`Searching for new wallpapers in the ${answers.category} category`)
+    console.log(`Searching for new wallpapers in the ${answers.category ? answers.category : "random"} category`)
     const imageSearchSettings = {
       query: `${answers.category}`,
       orientation: "landscape",
       count: 10 //Get 10 pictures from the API
     }
+
+    if (!answers.category) answers.category = "random"
 
     unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
       .then(response => {
