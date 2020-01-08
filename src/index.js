@@ -38,14 +38,14 @@ console.log(`
 
 `)
 
-inquirer.prompt(settings.questions).then(awnswers => {
-  console.log(`\n\nWallpaper will be refreshed every ${awnswers.interval.split(" ")[0]} ${awnswers.interval.split(" ")[1]}`);
+inquirer.prompt(settings.questions).then(answers => {
+  console.log(`\n\nWallpaper will be refreshed every ${answers.interval.split(" ")[0]} ${answers.interval.split(" ")[1]}`);
   
   const main = () => {
 
-    console.log(`Searching for new wallpapers in the ${awnswers.category} category`)
+    console.log(`Searching for new wallpapers in the ${answers.category} category`)
     const imageSearchSettings = {
-      query: `${awnswers.category}`,
+      query: `${answers.category}`,
       orientation: "landscape",
       count: 10 //Get 10 pictures from the API
     }
@@ -53,7 +53,7 @@ inquirer.prompt(settings.questions).then(awnswers => {
     unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
       .then(response => {
         let availablePictures = []
-        const fullPath = `${wallpaperDir}\\${awnswers.category}.jpg`
+        const fullPath = `${wallpaperDir}\\${answers.category}.jpg`
 
         response.forEach(result => {
           if (result.width > 1920 && result.height > 1080) { //HD-images only
@@ -77,7 +77,7 @@ inquirer.prompt(settings.questions).then(awnswers => {
   }
 
   main() //run first time
-  setInterval(main, getIntervalInMilliSeconds(awnswers.interval)) //then run every interval the user gave
+  setInterval(main, getIntervalInMilliSeconds(answers.interval)) //then run every interval the user gave
 })
 
 /**
@@ -151,7 +151,7 @@ const getRandomInt = (max) => {
 
 /**
  * This function turns the string interval the user provided to usable miliseconds
- * @param {string} userInterval the interval the user gave as awnswer at the start of the application
+ * @param {string} userInterval the interval the user gave as answer at the start of the application
  */
 const getIntervalInMilliSeconds = (userInterval) => {
   let number = userInterval.split(" ")[0]
