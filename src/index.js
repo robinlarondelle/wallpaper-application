@@ -9,7 +9,11 @@ const os = require("os")
 const inquirer = require("inquirer")
 const download = require('image-downloader')
 const moment = require("moment")
-
+const readline = require('readline')
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 global.fetch = fetch
 const unsplash = new Unsplash({ accessKey: settings.accessKey })
 const homedir = os.homedir()
@@ -39,49 +43,60 @@ console.log(`
 
 `)
 
-inquirer.prompt(settings.questions).then(answers => {
-  console.log(`\n\nWallpaper will be refreshed every ${answers.interval.split(" ")[0]} ${answers.interval.split(" ")[1]}`);
-  
-  const main = () => {
+runner()
 
-    console.log(`Searching for new wallpapers in the ${answers.category ? answers.category : "random"} category`)
-    const imageSearchSettings = {
-      query: `${answers.category}`,
-      orientation: "landscape",
-      count: 10 //Get 10 pictures from the API
+function runner() {
+  inquirer.prompt(settings.questions).then(answers => {
+    console.log(`\n\nWallpaper will be refreshed every ${answers.interval.split(" ")[0]} ${answers.interval.split(" ")[1]}`);
+
+    const main = () => {
+
+      console.log(`Searching for new wallpapers in the ${answers.category ? answers.category : "random"} category`)
+      const imageSearchSettings = {
+        query: `${answers.category}`,
+        orientation: "landscape",
+        count: 10 //Get 10 pictures from the API
+      }
+
+      if (!answers.category) answers.category = "random"
+
+      unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
+        .then(response => {
+          let availablePictures = []
+          const fullPath = `${wallpaperDir}\\${answers.category}.jpg`
+
+          response.forEach(result => {
+            if (result.width > 1920 && result.height > 1080) { //HD-images only
+              availablePictures.push(result)
+            }
+          })
+
+          const result = availablePictures[getRandomInt(availablePictures.length - 1)] //pick a random picture
+          downloadUnsplashImage(result.urls.full, fullPath, (err, savedPath) => {
+            if (err) return err
+            setWindowsWallpaper(savedPath)
+
+            inquirer.prompt(settings.information).then(answer => {
+              console.log(answer);
+              
+              if (answer.controls == "rs") runner()
+              if (answer.controls == "next") main()
+            })
+          })
+        })
+
+        .catch(err => {
+          console.log("\nLooks like something went wrong! Error:\n")
+          console.log(err)
+          console.log("\nclosing application\n")
+          process.exit(0)
+        })
     }
 
-    if (!answers.category) answers.category = "random"
-
-    unsplash.photos.getRandomPhoto(imageSearchSettings).then(toJson)
-      .then(response => {
-        let availablePictures = []
-        const fullPath = `${wallpaperDir}\\${answers.category}.jpg`
-
-        response.forEach(result => {
-          if (result.width > 1920 && result.height > 1080) { //HD-images only
-            availablePictures.push(result)
-          }
-        })
-
-        const result = availablePictures[getRandomInt(availablePictures.length - 1)] //pick a random picture
-        downloadUnsplashImage(result.urls.full, fullPath, (err, savedPath) => {
-          if (err) return err
-          setWindowsWallpaper(savedPath)
-        })
-      })
-
-      .catch(err => {
-        console.log("\nLooks like something went wrong! Error:\n")
-        console.log(err)
-        console.log("\nclosing application\n")
-        process.exit(0)
-      })
-  }
-
-  main() //run first time
-  setInterval(main, getIntervalInMilliSeconds(answers.interval)) //then run every interval the user gave
-})
+    main() //run first time
+    setInterval(main, getIntervalInMilliSeconds(answers.interval)) //then run every interval the user gave
+  })
+}
 
 /**
  * Downloads an image from the Unsplash API and saves it to the C:\[USER]\images\Wallpaper Application folder

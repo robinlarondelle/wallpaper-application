@@ -29,5 +29,12 @@ module.exports = {
       },
       default: "1 hour"
     }
+  ],
+  information: [
+    {
+      type: "input",
+      name: "controls",
+      message: "\nType 'rs' to restart the application. \nType 'next' for the next image."
+    }
   ]
 };
